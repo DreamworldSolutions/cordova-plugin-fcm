@@ -3,6 +3,8 @@
 
 var fs = require('fs');
 
+console.log('File is executed');
+
 var getValue = function(config, name) {
     var value = config.match(new RegExp('<' + name + '>(.*?)</' + name + '>', "i"))
     if(value && value[1]) {
@@ -17,6 +19,7 @@ function fileExists(path) {
     return fs.statSync(path).isFile();
   }
   catch (e) {
+	  console.log('Failed to check file', e);
     return false;
   }
 }
