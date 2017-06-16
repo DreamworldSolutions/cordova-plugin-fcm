@@ -49,7 +49,7 @@ if (directoryExists("platforms/ios")) {
 	}
 }
 
-if (directoryExists("platforms/android")) {
+
 	var path = "google-services.json";
 
     if (fileExists( path )) {
@@ -83,4 +83,3 @@ if (directoryExists("platforms/android")) {
     } else {
 		throw new Error("cordova-plugin-fcm: You have installed platform android but file 'google-services.json' was not found in your Cordova project root folder.")
 	}
-}
