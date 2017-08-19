@@ -115,6 +115,8 @@ NSString *const kGCMMessageIDKey = @"gcm.message_id";
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     // Print message ID.
+    
+    NSLog(@"userNotificationCenter :: For foreground is Invoked.");
     NSDictionary *userInfo = notification.request.content.userInfo;
     if (userInfo[kGCMMessageIDKey]) {
         NSLog(@"Message ID 1: %@", userInfo[kGCMMessageIDKey]);
@@ -138,6 +140,8 @@ NSString *const kGCMMessageIDKey = @"gcm.message_id";
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
 didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void (^)())completionHandler {
+    
+    NSLog(@"userNotificationCenter:: Tapped by user.");
     NSDictionary *userInfo = response.notification.request.content.userInfo;
     if (userInfo[kGCMMessageIDKey]) {
         NSLog(@"Message ID 2: %@", userInfo[kGCMMessageIDKey]);
@@ -172,6 +176,10 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
+
+    NSLog(@"didReceiveRemoteNotification:: receive_message in background iOS < 10");
+    [self updateBadge:userInfo];
+
     // Short-circuit when actually running iOS 10+, let notification centre methods handle the notification.
     if (NSFoundationVersionNumber >= NSFoundationVersionNumber_iOS_9_x_Max) {
         return;
@@ -199,6 +207,10 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
+
+    NSLog(@"didReceiveRemoteNotification:: receive_message iOS < 10");
+    [self updateBadge:userInfo];
+
     // Short-circuit when actually running iOS 10+, let notification centre methods handle the notification.
     if (NSFoundationVersionNumber >= NSFoundationVersionNumber_iOS_9_x_Max) {
         return;
@@ -240,10 +252,30 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 // [END receive_message iOS < 10]
 // [END message_handling]
 
+- (void)applicationReceivedRemoteMessage: (nonnull FIRMessagingRemoteMessage *)remoteMessage {
+  
+    NSLog(@"applicationReceivedRemoteMessage :: Invoked.");
+    NSDictionary *appData = remoteMessage.appData;
+    [self updateBadge:appData];
+}
+
+// [START update badge number ]
+-(void)updateBadge:(NSDictionary *)userInfo {
+    NSLog(@"updateBadge::  Updating badge number.");
+    NSNumber *badgeNumber = userInfo[@"badge"];
+    
+    if(badgeNumber == NULL){
+        return;
+    }
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber:[badgeNumber integerValue]];
+}
+// [END update badge number ]
 
 // [START refresh_token]
 - (void)tokenRefreshNotification:(NSNotification *)notification
 {
+    NSLog(@"tokenRefreshNotification :: Invoked.");
+
     // Note that this callback will be fired everytime a new token is generated, including the first
     // time. So if you need to retrieve the token as soon as it is available this is where that
     // should be done.
@@ -260,7 +292,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 // [START connect_to_fcm]
 - (void)connectToFcm
 {
-    
+    NSLog(@"connectToFcm :: Invoked.");
     // Won't connect since there is no token
     if (![[FIRInstanceID instanceID] token]) {
         return;
@@ -300,10 +332,10 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 
 +(NSData*)getLastPush
 {
+    NSLog(@"getLastPush::  Invoked.");
     NSData* returnValue = lastPush;
     lastPush = nil;
     return returnValue;
 }
-
 
 @end
