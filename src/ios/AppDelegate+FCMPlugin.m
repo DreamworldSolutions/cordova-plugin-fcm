@@ -124,6 +124,7 @@ NSString *const kGCMMessageIDKey = @"gcm.message_id";
     
     // Print full message.
     NSLog(@"%@", userInfo);
+    [self updateBadge:userInfo];
     
     NSError *error;
     NSDictionary *userInfoMutable = [userInfo mutableCopy];
